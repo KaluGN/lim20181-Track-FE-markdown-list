@@ -1,32 +1,22 @@
 #!/usr/bin/env node
-const mdLinks = require('./index.js');
-const [, , ...args]= process.argv;
-console.log(args[0]);
+const [, , ...args] = process.argv
 
-const ruta = args[0];
-const options = {
-  validate: false,
-  stats: false,
-} 
-if (!ruta) {
-  console.log('ingrese la ruta')
-}else{
-  mdLinks (ruta, options)
-  .then(response =>{
-    if (options.validate == false && options.stats == false){
-      console.log(`total: ${response.total} \nunique: ${response.unique} \nbroken: ${response.broken}`);
-    }else if (options.stats){
-      console.log(`total: ${response.total} \nunique: ${response.unique}`);
-    }else if (options.validate){
-      response.forEach(element => {
-        console.log(`${element.file}\n ${element.href}\n ${element.status}\n ${element.text}`)
-      });
-    }else if (Array.isArray (response)){
-      response.forEach(element =>{
-        console.log(`${element.file}\n ${element.href}\n ${element.text}`);
-      });
-    }else {
-      console.log(response);
-    } 
-  })
+const program = require('commander');
+const mdLinks = require('./index');
+const path = require('path');
+const route = path.resolve(args[0]);
+
+const mdlinks7 = (route,options) => {
+  mdLinks(route,options)
+  .then(console.log)
 }
+
+
+program
+  .version('0.1.0')
+  .arguments('<path>')
+  .option('-v, --validate')
+  .option('-s, --stats')
+  .action(mdlinks7)
+program.parse(process.argv)
+
