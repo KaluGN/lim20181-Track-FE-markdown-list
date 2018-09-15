@@ -8,7 +8,7 @@ const route = path.resolve(args[0]);
 
 const mdlinks7 = (route,options) => {
   mdLinks(route,options)
-  .then(console.log)
+  .then(res=>{})
 }
 
 
@@ -20,3 +20,5 @@ program
   .action(mdlinks7)
 program.parse(process.argv)
 
+// mdLinks(args[0],options)
+// .then(res=>{})

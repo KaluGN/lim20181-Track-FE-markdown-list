@@ -7,41 +7,60 @@ const uniques = (link) => {
   return [... new Set(link)];
 }
 
-const mdlinks = (ruta, options) => {
-    // console.log(path);
-    // console.log(options.validate);
-    return new Promise((resolve, reject) => {
-        if (fs.statSync(ruta).isFile()) {
-            if (path.extname(ruta) === '.md') {
-                if(options.validate && !options.stats){
-                    var markdown = fs.readFileSync(ruta).toString();
-                    var links = markdownLinkExtractor(markdown);
-                    // resolve(links)
-                    links.forEach((link) => {
-                        const linkHref = link.href;
-                        linkCheck(linkHref, function (err, result) {
-                            if (err) {
-                                console.error(err);
-                                return;
-                            }
-                            // console.log(`${result.link} is ${result.statusCode} is ${result.status}`);
-                            // console.log({link : result.link, status : result.statusCode, stat : result.status }) //Porque aquí no funciona el resolve ¡? Preguntar a una coach
-                        });
-                        console.log(`total: ${links.length}\nunicos :${uniques(linkHref).length}`)
-                    })
-                }else if(!options.validate && options.stats){
-                    console.log('return total unicos')
-                }else if(!options.validate && !options.stats){
-                    console.log('return los link(href,text)')
-                }else if(options.validate && options.stats){
-                    console.log('return total unicos rotos')
-                }
-            } else {
-                resolve('no soy md')
-            }
-        } else {
-            resolve('soy otraa cosa')
-        }
-    })
-}
+const validateEach = (link) => {
+     return new Promise((resolve, reject) => {
+        linkCheck(link, (err, result) => {
+          resolve({ href: result.link, status: result.status, statusText: result.statusCode })
+        })
+      })
+    }
+const validate = (arrLinks) => Promise.all(arrLinks.map(link => validateEach(link))).then(console.log)
+
+
+
+const mdlinks = (ruta, options) => new Promise((resolve, reject) => {
+  const newRoute = path.resolve(ruta);
+  if (fs.statSync(ruta).isFile()) {
+    if (path.extname(ruta) === '.md') {
+      let markdown = fs.readFileSync(ruta, 'utf-8');
+      let arrLinks = []
+      let arrResp = []
+      var links = markdownLinkExtractor(markdown);
+      links.forEach((link) => {
+
+        arrLinks.push(link.href)
+      })
+
+      if (options.validate && !options.stats) {
+        // arrLinks.forEach((el) => {
+        const answer = validate(arrLinks, arrResp)
+        // })
+        resolve(answer)
+
+
+
+      }
+      else {
+        links.forEach((link) => {
+          arrResp.push({ "href": link.href, "text": link.text, "file": ruta })
+
+        }); resolve(arrResp)
+      }
+
+      // else if (!options.validate && options.stats) {
+      //   console.log('return total unicos')
+      // } else if (!options.validate && !options.stats) {
+      //   console.log('return los link(href,text)')
+      // } else if (options.validate && options.stats) {
+      //   console.log('return total unicos rotos')
+      // }
+    }
+    //   else {
+    //     resolve('no soy md')
+    //   }
+    // } else {
+    //   resolve('soy otraa cosa')
+  }
+
+})
 module.exports = mdlinks;
