@@ -8,7 +8,7 @@ const route = path.resolve(args[0]);
 
 const mdlinks7 = (route,options) => {
   mdLinks(route,options)
-  .then(res=>{})
+  .then(res=>console.log(res))
 }
 
 

@@ -3,29 +3,34 @@ const linkCheck = require('link-check');
 const markdownLinkExtractor = require('markdown-link-extractor');
 const path = require('path');
 
-const uniques = (link) => {
-  return [... new Set(link)];
+const uniques = (arrLinks) => {
+  return new Set(arrLinks.map((linkObj) => linkObj.href))
+}
+
+const stats = (arrLinks) => {
+  return [{
+    unique: uniques(arrLinks).size,
+    total: arrLinks.length,
+  }]
 }
 
 const validateEach = (link) => {
   return new Promise((resolve, reject) => {
     linkCheck(link, (err, result) => {
-      resolve({ href: result.link, status: result.status, statusText: result.statusCode })
+      resolve({ href: result.link, status: result.statusCode, statusText: result.status })
     })
   })
 }
-const validate = (arrLinks) => Promise.all(arrLinks.map(link => validateEach(link))).then(console.log)
 
-// const allMarkdown = (rutaAbsoluta) => {
-//   if (fs.statSync(rutaAbsoluta).isFile()) {
-//     if(path.extname(rutaAbsoluta) === '.md') {
-//       return rutaAbsoluta;
-//     }
-//   } else {
-//     console.log(rutaAbsoluta)
-//   }
-// }
+const validate = (arrLinks) => Promise.all(arrLinks.map(link => validateEach(link.href)))
 
+const statsValidate = (arrLinks) => {
+  const statsResult = stats(arrLinks);
+  return validate(arrLinks).then(r => {
+    statsResult[0].broken = r.filter(link => link.statusText === 'dead').length;
+    return statsResult;
+  });
+}
 
 const allFiles = (rutaAbsoluta, arrLinks) => new Promise((resolve, reject) => {
   if (fs.statSync(rutaAbsoluta).isFile()) {
@@ -39,50 +44,33 @@ const allFiles = (rutaAbsoluta, arrLinks) => new Promise((resolve, reject) => {
   }
 })
 
-const mdlinks = (ruta, options) => new Promise((resolve, reject) => {
-  const newRoute = path.resolve(ruta);
-  allFiles(newRoute).then(console.log)
-  if (fs.statSync(ruta).isFile()) {
-    if (path.extname(ruta) === '.md') {
-      let markdown = fs.readFileSync(ruta, 'utf-8');
-      let arrLinks = []
-      let arrResp = []
-      var links = markdownLinkExtractor(markdown);
-      links.map((link) => {
-        console.log(link)
-        //arrLinks.push(link.href)
+const extractLinks = (ruta) => new Promise((resolve, reject) => {
+  fs.readFile(ruta, 'utf-8', (error, result) => {
+    resolve(markdownLinkExtractor(result).map((link) => {
+      return ({
+        href: link.href,
+        title: link.text,
+        file: ruta
       })
-
-      if (options.validate && !options.stats) {
-        // arrLinks.forEach((el) => {
-        const answer = validate(arrLinks, arrResp)
-        // })
-        resolve(answer)
-
-
-
-      }
-      else {
-        links.forEach((link) => {
-          arrResp.push({ "href": link.href, "text": link.text, "file": ruta })
-
-        }); resolve(arrResp)
-      }
-
-      // else if (!options.validate && options.stats) {
-      //   console.log('return total unicos')
-      // } else if (!options.validate && !options.stats) {
-      //   console.log('return los link(href,text)')
-      // } else if (options.validate && options.stats) {
-      //   console.log('return total unicos rotos')
-      // }
-    }
-    //   else {
-    //     resolve('no soy md')
-    //   }
-    // } else {
-    //   resolve('soy otraa cosa')
-  }
-
+    }))
+  })
 })
+
+const mdlinks = (ruta, options) => allFiles(path.resolve(ruta)).then(files => {
+  if (typeof files === 'string' && path.extname(ruta) === '.md') {
+    return extractLinks(files)
+  } else {
+    return Promise.all(files.map(file => extractLinks(file)))
+      .then(arr => [].concat(...arr))
+  }
+}).then(links => {
+  if (options.validate && options.stats) {
+    return statsValidate(links);
+  } else if (options.validate) {
+    return validate(links);
+  } else if (options.stats) {
+    return stats(links);
+  }
+})
+
 module.exports = mdlinks;
