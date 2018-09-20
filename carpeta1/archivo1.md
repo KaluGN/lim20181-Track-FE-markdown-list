@@ -1,1 +1,0 @@
-[Git de Leyla](https://github.com/ticze)

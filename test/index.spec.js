@@ -24,7 +24,7 @@ test('Debería retornar [{Total : 6, Unique: 8}]', () => {
     return expect(Promise.resolve(mdlinks("test", options))).resolves.toMatchSnapshot();
 });
 
-test('Debería retornar "Dead" o "alive"', () => {
+test('Debería retornar "404 - Dead" || "200 - alive"', () => {
     const options = {
         validate: true,
         stats: false
