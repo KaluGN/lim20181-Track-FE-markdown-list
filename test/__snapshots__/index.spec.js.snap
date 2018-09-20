@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Debería retornar "Dead" o "alive" 1`] = `
+Array [
+  Object {
+    "href": "https://goo.gl/fbAQLP",
+    "status": 200,
+    "statusText": "alive",
+  },
+]
+`;
+
+exports[`Debería retornar [{Total : 6, Unique : 8, Broken : 3}] 1`] = `
+Array [
+  Object {
+    "broken": 0,
+    "total": 1,
+    "unique": 1,
+  },
+]
+`;
+
+exports[`Debería retornar [{Total : 6, Unique: 8}] 1`] = `
+Array [
+  Object {
+    "total": 1,
+    "unique": 1,
+  },
+]
+`;
