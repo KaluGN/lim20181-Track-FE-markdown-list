@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Debería retornar "Dead" o "alive" 1`] = `
+exports[`Debería retornar "404 - Dead" || "200 - alive" 1`] = `
 Array [
   Object {
     "href": "https://goo.gl/fbAQLP",
