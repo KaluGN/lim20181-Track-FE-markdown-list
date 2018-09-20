@@ -15,5 +15,8 @@
     "commander": "^2.18.0",
     "link-check": "^4.4.4",
     "markdown-link-extractor": "git+https://github.com/KaluGN/markdown-link-extractor.git"
+  },
+  "devDependencies": {
+    "jest": "^23.6.0"
   }
 }
