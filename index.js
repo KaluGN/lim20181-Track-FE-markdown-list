@@ -70,7 +70,8 @@ const mdlinks = (ruta, options) => allFiles(path.resolve(ruta)).then(files => {
     return validate(links);
   } else if (options.stats) {
     return stats(links);
-  }
+  } 
+  return links
 })
 
 module.exports = mdlinks;
