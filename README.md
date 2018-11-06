@@ -1,44 +1,76 @@
 # Markdown Links
 
-## Preámbulo
+## Descripción
 
-[Markdown](https://es.wikipedia.org/wiki/Markdown) es un lenguaje de marcado
-ligero muy popular entre developers. Es usado en muchísimas plataformas que
-manejan texto plano (GitHub, foros, blogs, ...), y es muy común
-encontrar varios archivos en ese formato en cualquier tipo de repositorio
-(empezando por el tradicional `README.md`).
+Esta [librería](https://www.npmjs.com/package/validador-mdlinks) permite visualizar el nombre, dirección y el estado de los links de un archivo de formato MD.
 
-Estos archivos `Markdown` normalmente contienen _links_ (vínculos/ligas) que
-muchas veces están rotos o ya no son válidos y eso perjudica mucho el valor de
-la información que se quiere compartir.
+El comportamiento por defecto es analizar un archivo Markdown y mostrar los links encontrados.
 
-Dentro de una comunidad de código abierto, nos han propuesto crear una
-herramienta usando [Node.js](https://nodejs.org/), que lea y analice archivos
-en formato `Markdown`, para verificar los links que contengan y reportar
-algunas estadísticas.
+## Versión
 
-![md-links](https://user-images.githubusercontent.com/110297/42118443-b7a5f1f0-7bc8-11e8-96ad-9cc5593715a6.jpg)
+v 1.0.1
 
-## Introducción
 
-[Node.js](https://nodejs.org/es/) es un entorno de ejecución para JavaScript
-construido con el [motor de JavaScript V8 de Chrome](https://developers.google.com/v8/).
-Esto nos va a permitir ejecuta JavaScript en el entorno del sistema operativo,
-ya sea tu máquina o un servidor, lo cual nos abre las puertas para poder interac
-tuar con el sistema operativo, sistema de archivos, redes, ...
-En este proyecto nos alejamos un poco del navegador para construir un programa
-que se ejecute usando Node.js, donde aprenderemos sobre cómo interactuar con el
-sistema archivos, con el entorno (proceso, env, stdin/stdout/stderr), ...
+## Instalación
 
-## Objetivos
+npm i validador-mdlinks
 
-El objetivo práctico de este proyecto es que aprendas cómo crear tu propia
-**librería** (o biblioteca - _library_) en JavaScript.
-Diseñar tu propia librería es una experiencia fundamental para cualquier
-desarrollador porque que te obliga a pensar en la interfaz (API) de tus _módulos_
-y como será usado por otros developers, debes tener especial consideración en
-peculiaridades del lenguaje, convenciones y buenas prácticas.
+### CLI (Línea de comando)
 
-[Git de Leyla](https://github.com/ticse)
-[Git de Leyla](https://github.com/ticse)
-[Git de Leyla](https://github.com/ticse)
+El ejecutable de nuestra aplicación debe poder ejecutarse de la siguiente
+manera a través de la terminal:
+
+`md-links <path-to-file> [options]`
+
+Por ejemplo:
+
+```sh
+$ md-links ./some/example.md
+./some/example.md http://algo.com/2/3/ Link a algo
+./some/example.md https://otra-cosa.net/algun-doc.html algún doc
+./some/example.md http://google.com/ Google
+```
+
+
+
+### Options
+
+#### `--validate`
+
+Al pasar la opción `--validate`, se valida el funcionamiento del link, si resulta en una redirección a una
+URL que responde ok, entonces consideraremos que el link es válido.
+
+Por ejemplo:
+
+```sh
+$ md-links ./some/example.md --validate
+./some/example.md http://algo.com/2/3/ ok 200 Link a algo
+./some/example.md https://otra-cosa.net/algun-doc.html fail 404 algún doc
+./some/example.md http://google.com/ ok 301 Google
+```
+
+El _output_ en este caso incluye la palabra `ok` o `fail` después de
+la URL, así como el status de la respuesta recibida a la petición HTTP a dicha
+URL.
+
+#### `--stats`
+
+Al pasar la opción `--stats` el output (salida) será un texto con estadísticas
+básicas sobre los links.
+
+```sh
+$ md-links ./some/example.md --stats
+Total: 3
+Unique: 2
+```
+
+#### `--stats` y `--validate`
+Al combinar `--stats` y `--validate` obtendras estadísticas que necesiten de los resultados de la validación.
+
+```sh
+$ md-links ./some/example.md --stats --validate
+Total: 4
+Unique: 3
+Broken: 1
+```
+
